@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Job Predictor!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brain.js@2.0.0-beta.23/dist/browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles & CSS Variables --- */
+        :root {
+            /* Default Theme (Playful Green/Yellow) */
+            --bg-color: #F0FFF4; /* green-50 */
+            --main-container-bg: #ffffff;
+            --main-container-border: #2F855A; /* green-700 */
+            --main-container-shadow: #2F855A;
+            --step-card-bg: #FEFCBF; /* yellow-100 */
+            --step-card-border: #F6E05E; /* yellow-400 */
+            --step-card-shadow: #ECC94B; /* yellow-500 */
+            --choice-bg: #C6F6D5; /* green-200 */
+            --choice-border: #68D391; /* green-400 */
+            --choice-text: #22543D; /* green-900 */
+            --choice-hover-bg: #9AE6B4; /* green-300 */
+            --choice-selected-bg: #48BB78; /* green-500 */
+            --choice-selected-border: #2F855A; /* green-700 */
+            --choice-selected-text: #F0FFF4; /* green-50 */
+            --action-button-text: white;
+            --action-button-border: #276749; /* green-800 */
+            --action-button-shadow: #276749;
+            --action-button-hover-shadow: #22543D; /* green-900 */
+            --action-button-active-shadow: #276749;
+            --predict-button-bg: #ECC94B; /* yellow-500 */
+            --predict-button-hover-bg: #D69E2E; /* yellow-600 */
+            --predict-button-active-bg: #B7791F; /* yellow-700 */
+            --reset-button-bg: #4FD1C5; /* teal-400 */
+            --reset-button-hover-bg: #38B2AC; /* teal-500 */
+            --reset-button-active-bg: #319795; /* teal-600 */
+            --result-area-bg: #FEFCBF; /* yellow-100 */
+            --result-area-border: #F6E05E; /* yellow-400 */
+            --result-area-shadow: #ECC94B; /* yellow-500 */
+            --result-text-color: #B7791F; /* yellow-800 */
+            --predicted-job-text: #744210; /* yellow-900 */
+            --thinking-text-color: #975A16; /* yellow-800 */
+            --heading-color: #2F855A; /* green-700 */
+            --subheading-color: #276749; /* green-800 */
+            --step-heading-color: #718096; /* gray-600 */
+            --question-text-color: #22543D; /* green-900 */
+            --label-color: #276749;
+            --footer-text-color: #718096; /* gray-600 */
+            --focus-ring-color: var(--predict-button-bg);
+            --theme-selector-bg: #FEFCBF;
+            --theme-selector-border: #F6E05E;
+            --theme-selector-text: #B7791F;
+        }
+
+        /* --- Theme Definitions (Same as before) --- */
+        body[data-theme="ocean-blue"] { --bg-color: #E0F2FE; --main-container-bg: #ffffff; --main-container-border: #075985; --main-container-shadow: #075985; --step-card-bg: #CFFAFE; --step-card-border: #67E8F9; --step-card-shadow: #22D3EE; --choice-bg: #A5F3FC; --choice-border: #67E8F9; --choice-text: #155E75; --choice-hover-bg: #67E8F9; --choice-selected-bg: #22D3EE; --choice-selected-border: #0E7490; --choice-selected-text: #164E63; --action-button-border: #075985; --action-button-shadow: #075985; --action-button-hover-shadow: #075985; --action-button-active-shadow: #075985; --predict-button-bg: #38BDF8; --predict-button-hover-bg: #0EA5E9; --predict-button-active-bg: #0284C7; --reset-button-bg: #2DD4BF; --reset-button-hover-bg: #14B8A6; --reset-button-active-bg: #0D9488; --result-area-bg: #A5F3FC; --result-area-border: #67E8F9; --result-area-shadow: #22D3EE; --result-text-color: #164E63; --predicted-job-text: #083344; --thinking-text-color: #155E75; --heading-color: #0C4A6E; --subheading-color: #155E75; --step-heading-color: #0369A1; --question-text-color: #1E40AF; --label-color: #155E75; --footer-text-color: #0369A1; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #A5F3FC; --theme-selector-border: #67E8F9; --theme-selector-text: #155E75; }
+        body[data-theme="forest-green"] { --bg-color: #F0FFF4; --main-container-bg: #ffffff; --main-container-border: #2F855A; --main-container-shadow: #2F855A; --step-card-bg: #FEFCBF; --step-card-border: #F6E05E; --step-card-shadow: #ECC94B; --choice-bg: #C6F6D5; --choice-border: #68D391; --choice-text: #22543D; --choice-hover-bg: #9AE6B4; --choice-selected-bg: #48BB78; --choice-selected-border: #2F855A; --choice-selected-text: #F0FFF4; --action-button-border: #276749; --action-button-shadow: #276749; --action-button-hover-shadow: #22543D; --action-button-active-shadow: #276749; --predict-button-bg: #ECC94B; --predict-button-hover-bg: #D69E2E; --predict-button-active-bg: #B7791F; --reset-button-bg: #4FD1C5; --reset-button-hover-bg: #38B2AC; --reset-button-active-bg: #319795; --result-area-bg: #FEFCBF; --result-area-border: #F6E05E; --result-area-shadow: #ECC94B; --result-text-color: #B7791F; --predicted-job-text: #744210; --thinking-text-color: #975A16; --heading-color: #2F855A; --subheading-color: #276749; --step-heading-color: #718096; --question-text-color: #22543D; --label-color: #276749; --footer-text-color: #718096; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #FEFCBF; --theme-selector-border: #F6E05E; --theme-selector-text: #B7791F; }
+        body[data-theme="cosmic-purple"] { --bg-color: #F5F3FF; --main-container-bg: #1E1B4B; --main-container-border: #A78BFA; --main-container-shadow: #A78BFA; --step-card-bg: #3730A3; --step-card-border: #C4B5FD; --step-card-shadow: #A78BFA; --choice-bg: #4338CA; --choice-border: #A78BFA; --choice-text: #EEF2FF; --choice-hover-bg: #5B21B6; --choice-selected-bg: #7C3AED; --choice-selected-border: #C4B5FD; --choice-selected-text: #F5F3FF; --action-button-text: #1E1B4B; --action-button-border: #A78BFA; --action-button-shadow: #A78BFA; --action-button-hover-shadow: #A78BFA; --action-button-active-shadow: #A78BFA; --predict-button-bg: #F472B6; --predict-button-hover-bg: #EC4899; --predict-button-active-bg: #DB2777; --reset-button-bg: #A78BFA; --reset-button-hover-bg: #8B5CF6; --reset-button-active-bg: #7C3AED; --result-area-bg: #4338CA; --result-area-border: #A78BFA; --result-area-shadow: #A78BFA; --result-text-color: #C4B5FD; --predicted-job-text: #EDE9FE; --thinking-text-color: #A78BFA; --heading-color: #EDE9FE; --subheading-color: #C4B5FD; --step-heading-color: #DDD6FE; --question-text-color: #DDD6FE; --label-color: #C4B5FD; --footer-text-color: #A78BFA; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #4338CA; --theme-selector-border: #A78BFA; --theme-selector-text: #EEF2FF; }
+        body[data-theme="sunny-yellow"] { --bg-color: #FEF9C3; --main-container-bg: #ffffff; --main-container-border: #CA8A04; --main-container-shadow: #CA8A04; --step-card-bg: #FEF08A; --step-card-border: #FACC15; --step-card-shadow: #EAB308; --choice-bg: #FEF3C7; --choice-border: #FDE047; --choice-text: #854D0E; --choice-hover-bg: #FDE047; --choice-selected-bg: #FACC15; --choice-selected-border: #CA8A04; --choice-selected-text: #78350F; --action-button-border: #CA8A04; --action-button-shadow: #CA8A04; --action-button-hover-shadow: #CA8A04; --action-button-active-shadow: #CA8A04; --predict-button-bg: #FB923C; --predict-button-hover-bg: #F97316; --predict-button-active-bg: #EA580C; --reset-button-bg: #FACC15; --reset-button-hover-bg: #EAB308; --reset-button-active-bg: #CA8A04; --result-area-bg: #FEF3C7; --result-area-border: #FDE047; --result-area-shadow: #EAB308; --result-text-color: #854D0E; --predicted-job-text: #713F12; --thinking-text-color: #A16207; --heading-color: #B45309; --subheading-color: #A16207; --step-heading-color: #B45309; --question-text-color: #B45309; --label-color: #A16207; --footer-text-color: #B45309; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #FEF3C7; --theme-selector-border: #FDE047; --theme-selector-text: #854D0E; }
+        body[data-theme="candy-pink"] { --bg-color: #FDF2F8; --main-container-bg: #ffffff; --main-container-border: #9D174D; --main-container-shadow: #9D174D; --step-card-bg: #FCE7F3; --step-card-border: #F9A8D4; --step-card-shadow: #F472B6; --choice-bg: #FBCFE8; --choice-border: #F9A8D4; --choice-text: #9D174D; --choice-hover-bg: #F9A8D4; --choice-selected-bg: #F472B6; --choice-selected-border: #DB2777; --choice-selected-text: #831843; --action-button-border: #9D174D; --action-button-shadow: #9D174D; --action-button-hover-shadow: #9D174D; --action-button-active-shadow: #9D174D; --predict-button-bg: #A78BFA; --predict-button-hover-bg: #8B5CF6; --predict-button-active-bg: #7C3AED; --reset-button-bg: #F472B6; --reset-button-hover-bg: #EC4899; --reset-button-active-bg: #DB2777; --result-area-bg: #FBCFE8; --result-area-border: #F9A8D4; --result-area-shadow: #F472B6; --result-text-color: #9D174D; --predicted-job-text: #831843; --thinking-text-color: #BE185D; --heading-color: #831843; --subheading-color: #BE185D; --step-heading-color: #DB2777; --question-text-color: #BE185D; --label-color: #BE185D; --footer-text-color: #9D174D; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #FBCFE8; --theme-selector-border: #F9A8D4; --theme-selector-text: #9D174D; }
+        body[data-theme="night-mode"] { --bg-color: #111827; --main-container-bg: #1F2937; --main-container-border: #6B7280; --main-container-shadow: #9CA3AF; --step-card-bg: #374151; --step-card-border: #9CA3AF; --step-card-shadow: #D1D5DB; --choice-bg: #4B5563; --choice-border: #9CA3AF; --choice-text: #F9FAFB; --choice-hover-bg: #52525b; --choice-selected-bg: #6B7280; --choice-selected-border: #D1D5DB; --choice-selected-text: #F9FAFB; --action-button-text: #111827; --action-button-border: #9CA3AF; --action-button-shadow: #9CA3AF; --action-button-hover-shadow: #D1D5DB; --action-button-active-shadow: #6B7280; --predict-button-bg: #60A5FA; --predict-button-hover-bg: #3B82F6; --predict-button-active-bg: #2563EB; --reset-button-bg: #34D399; --reset-button-hover-bg: #10B981; --reset-button-active-bg: #059669; --result-area-bg: #4B5563; --result-area-border: #9CA3AF; --result-area-shadow: #D1D5DB; --result-text-color: #ECFDF5; --predicted-job-text: #f0fdf4; --thinking-text-color: #D1D5DB; --heading-color: #F9FAFB; --subheading-color: #E5E7EB; --step-heading-color: #D1D5DB; --question-text-color: #E5E7EB; --label-color: #E5E7EB; --footer-text-color: #9CA3AF; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #4B5563; --theme-selector-border: #9CA3AF; --theme-selector-text: #F9FAFB; }
+
+        /* --- General Styles --- */
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding-top: 5rem; /* Space for theme selector */
+            position: relative;
+            transition: background-color 0.3s ease;
+            overflow-x: hidden;
+        }
+        main { flex-grow: 1; }
+
+        .main-container {
+            background-color: var(--main-container-bg);
+            border: 3px solid var(--main-container-border);
+            border-radius: 20px;
+            box-shadow: 8px 8px 0px var(--main-container-shadow);
+            width: 100%;
+            max-width: 52rem; /* Wider for more choices per row */
+            margin: 2rem auto 1rem auto; /* Default margin */
+            padding: 1.5rem sm:p-8;
+            text-align: center;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Question Card Styling */
+        .question-card {
+            background-color: var(--step-card-bg);
+            border: 2px solid var(--step-card-border);
+            border-radius: 16px;
+            box-shadow: 4px 4px 0px var(--step-card-shadow);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease; /* Smooth transition */
+        }
+        .question-card.changing {
+            transform: scale(0.98);
+            opacity: 0.8;
+        }
+
+        /* Choices Grid */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); /* Allow slightly wider min */
+            gap: 0.75rem;
+            justify-items: center;
+            margin-top: 1rem;
+        }
+
+        /* Choice Button Styling - Fixed Layout v6 */
+        .choice-button {
+            background-color: var(--choice-bg);
+            color: var(--choice-text);
+            border: 2px solid var(--choice-border);
+            border-radius: 12px;
+            padding: 0.5rem; /* Consistent padding */
+            font-weight: 500;
+            font-size: 0.75rem; /* text-xs */
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+            width: 100%;
+            max-width: 190px;
+            display: flex;
+            flex-direction: row; /* Keep side-by-side */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            gap: 0.3rem;
+            box-shadow: 3px 3px 0px var(--choice-border);
+            min-height: 48px; /* Allow height to adjust slightly */
+            text-align: center;
+            line-height: 1.25; /* Slightly more line height */
+            overflow-wrap: anywhere; /* More aggressive word break */
+            word-break: break-word;
+        }
+        .choice-button:hover {
+            background-color: var(--choice-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px var(--choice-border);
+        }
+        .choice-button.selected {
+            background-color: var(--choice-selected-bg);
+            border-color: var(--choice-selected-border);
+            color: var(--choice-selected-text);
+            box-shadow: 2px 2px 0px var(--choice-selected-border);
+            transform: translateY(1px);
+        }
+        .choice-button span { /* Emoji span */
+            font-size: 1.1rem; /* Slightly smaller emoji */
+            display: inline-block;
+            line-height: 1;
+            flex-shrink: 0; /* Prevent emoji from shrinking */
+            margin-right: 0.2rem; /* Space after emoji */
+        }
+         .choice-button .text-content { /* Text wrapper */
+             flex-shrink: 1; /* Allow text to shrink if needed */
+             text-align: center;
+        }
+
+
+        /* Action Button Styles */
+        .action-button {
+            color: var(--action-button-text); font-weight: 700; padding: 0.8rem 1.8rem; border-radius: 1rem; border: 3px solid var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); transition: all 0.15s ease-out; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1rem; min-width: 120px; transform-style: preserve-3d;
+        }
+        .action-button:hover { box-shadow: 6px 6px 0px var(--action-button-hover-shadow); transform: translateY(-3px) translateX(-2px) translateZ(5px); }
+        .action-button:active { box-shadow: 2px 2px 0px var(--action-button-active-shadow); transform: translateY(2px) translateX(2px) translateZ(0px); }
+        .action-button:focus { outline: none; box-shadow: 5px 5px 0px var(--action-button-shadow), 0 0 0 3px var(--bg-color), 0 0 0 5px var(--focus-ring-color); }
+        .action-button:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: 5px 5px 0px var(--action-button-shadow); transform: none; }
+
+        #predictBtn { background-color: var(--predict-button-bg); border-color: var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); --focus-ring-color: var(--predict-button-bg); }
+        #predictBtn:hover:not(:disabled) { background-color: var(--predict-button-hover-bg); box-shadow: 6px 6px 0px var(--action-button-hover-shadow); }
+        #predictBtn:active:not(:disabled) { background-color: var(--predict-button-active-bg); box-shadow: 2px 2px 0px var(--action-button-active-shadow); }
+
+        #resetBtn { background-color: var(--reset-button-bg); border-color: var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); --focus-ring-color: var(--reset-button-bg); }
+        #resetBtn:hover { background-color: var(--reset-button-hover-bg); box-shadow: 6px 6px 0px var(--action-button-hover-shadow); }
+        #resetBtn:active { background-color: var(--reset-button-active-bg); box-shadow: 2px 2px 0px var(--action-button-active-shadow); }
+
+
+        /* Result Area Styles */
+        #resultArea {
+            background-color: var(--result-area-bg); border: 2px dashed var(--result-area-border); border-radius: 16px; box-shadow: 4px 4px 0px var(--result-area-shadow); padding: 1.5rem; margin-top: 2rem; min-height: 150px; text-align: center; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; opacity: 0; transform: scale(0.9) rotate(-2deg); display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #resultArea.visible { opacity: 1; transform: scale(1) rotate(0deg); animation: reveal 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+        #resultText { font-size: 1.3rem; font-weight: 600; color: var(--result-text-color); margin-bottom: 0.5rem; transition: color 0.3s ease; line-height: 1.4; }
+        #predictedJob { font-size: 2rem; font-weight: 700; margin: 0.5rem 0 1rem 0; padding: 0.5rem 1rem; border-radius: 8px; display: inline-block; color: var(--predicted-job-text); background-color: rgba(255, 255, 255, 0.3); }
+        #thinkingText { font-style: italic; color: var(--thinking-text-color); transition: color 0.3s ease; font-size: 1.1rem; margin-bottom: 1rem; }
+
+        /* Headings & Labels */
+        .question-heading { /* Class for question text */
+            font-size: 1.1rem; /* Adjusted size */
+            font-weight: 600;
+            color: var(--question-text-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px dashed var(--step-card-border);
+            transition: color 0.3s ease;
+            line-height: 1.4;
+        }
+        .main-heading { color: var(--heading-color); transition: color 0.3s ease; padding-top: 1rem; /* Default padding */ }
+        .sub-heading { color: var(--subheading-color); transition: color 0.3s ease; font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; }
+
+        /* Footer Styling */
+        .page-footer { text-align: center; padding: 1rem 0; margin-top: 1rem; font-size: 0.8rem; color: var(--footer-text-color); flex-shrink: 0; line-height: 1.5; transition: color 0.3s ease; }
+        .page-footer p { margin-bottom: 0.25rem; }
+
+        /* Theme Selector Styles */
+        .theme-selector-container { position: absolute; top: 1rem; right: 1rem; z-index: 10; }
+        .theme-selector-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        #themeSelector { padding: 0.4rem 0.8rem; border-radius: 8px; border: 2px solid var(--theme-selector-border); background-color: var(--theme-selector-bg); color: var(--theme-selector-text); font-weight: 500; cursor: pointer; box-shadow: 2px 2px 0px var(--theme-selector-border); transition: all 0.2s ease; vertical-align: middle; font-size: 0.8rem; }
+        #themeSelector:focus { outline: none; box-shadow: 2px 2px 0px var(--theme-selector-border), 0 0 0 3px var(--main-container-bg), 0 0 0 5px var(--theme-selector-border); }
+
+        /* Dark Theme Adjustments */
+        body[data-theme="cosmic-purple"] .main-heading svg,
+        body[data-theme="night-mode"] .main-heading svg { color: #F687B3; /* pink-400 */ }
+        body[data-theme="cosmic-purple"] .sub-heading,
+        body[data-theme="night-mode"] .sub-heading { color: #D1D5DB; }
+        body[data-theme="cosmic-purple"] #themeSelector:focus,
+        body[data-theme="night-mode"] #themeSelector:focus { box-shadow: 2px 2px 0px var(--theme-selector-border), 0 0 0 3px var(--main-container-bg), 0 0 0 5px var(--theme-selector-border); }
+        body[data-theme="cosmic-purple"] #predictedJob,
+        body[data-theme="night-mode"] #predictedJob { background-color: rgba(0, 0, 0, 0.2); color: #FFF; }
+
+
+        /* Hide class utility */
+        .hidden { display: none; }
+
+        /* Animation for result reveal */
+        @keyframes reveal { from { transform: scale(0.8) rotate(-5deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <div class="theme-selector-container">
+        <label for="themeSelector" class="theme-selector-label">Choose a Theme:</label>
+        <select id="themeSelector">
+            <option value="default">🎨 Default</option>
+            <option value="ocean-blue">🌊 Ocean Blue</option>
+            <option value="forest-green">🌲 Forest Green</option>
+            <option value="cosmic-purple">✨ Cosmic Purple</option>
+            <option value="sunny-yellow">☀️ Sunny Yellow</option>
+            <option value="candy-pink">🍬 Candy Pink</option>
+            <option value="night-mode">🌙 Night Mode</option>
+        </select>
+    </div>
+
+    <main>
+        <div class="main-container">
+            <h1 class="main-heading text-3xl sm:text-4xl font-bold text-center mb-4 tracking-tight flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-9 h-9 text-yellow-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.05a2.25 2.25 0 01-2.25 2.25h-12a2.25 2.25 0 01-2.25-2.25v-4.05m16.5 0a2.25 2.25 0 00-2.25-2.25h-12a2.25 2.25 0 00-2.25 2.25m16.5 0v-4.05a2.25 2.25 0 00-2.25-2.25h-12a2.25 2.25 0 00-2.25 2.25v4.05m0 0a2.25 2.25 0 002.25 2.25h12a2.25 2.25 0 002.25-2.25m-16.5-6.075l.150-.09a1.5 1.5 0 011.74 0l4.96 2.976a1.5 1.5 0 001.74 0l.15-.09" />
+                </svg>
+                 Dream Job Predictor <span class="text-2xl">💼</span>
+            </h1>
+
+            <p class="sub-heading text-center mb-8">Answer these 5 fun questions about yourself, and the AI will predict your dream job path! 🚀</p>
+
+            <div id="questionsContainer">
+                </div>
+
+            <div id="predictButtonContainer" class="text-center mt-6 hidden">
+                 <button id="predictBtn" class="action-button" disabled>🔮 Predict My Dream Job!</button>
+            </div>
+
+
+            <div id="resultArea" class="hidden">
+                <p id="thinkingText">🧠 Analyzing personality matrix...</p>
+                <p id="resultText"></p>
+                <div id="predictedJob" class="hidden">JOB CATEGORY</div>
+                <button id="resetBtn" class="action-button mt-4">Try Again? 🔁</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>© 2025 ToolForge. All rights reserved.</p>
+        <p>Built with ❤️ by Anas.</p>
+    </footer>
+
+    <script>
+        // --- DOM Elements ---
+        const questionsContainer = document.getElementById('questionsContainer');
+        const resultArea = document.getElementById('resultArea');
+        const thinkingText = document.getElementById('thinkingText');
+        const resultText = document.getElementById('resultText');
+        const predictedJobDiv = document.getElementById('predictedJob');
+        const predictBtn = document.getElementById('predictBtn');
+        const predictButtonContainer = document.getElementById('predictButtonContainer');
+        const resetBtn = document.getElementById('resetBtn');
+        const themeSelector = document.getElementById('themeSelector');
+
+        // --- Game State ---
+        let userChoices = {}; // Store choices as { questionId: choiceValue }
+        let currentRoundQuestions = []; // Stores the 5 questions for the current round
+        const NUM_QUESTIONS = 5;
+
+        // --- Question Pool (Expanded to 50+) ---
+        const questionPool = [
+             // Activity Preferences
+            { id: 'q1', text: "What sounds most fun?", category: 'activity', options: [{text:"Solving Puzzles 🧩", value:"solving"}, {text:"Creating Art/Music 🎨", value:"creating"}, {text:"Building/Fixing Things 🏗️", value:"building"}, {text:"Helping People 🤝", value:"helping"}, {text:"Organizing Things 📋", value:"organizing"}] },
+            { id: 'q2', text: "You'd rather spend an afternoon...", category: 'activity', options: [{text:"Reading quietly 📚", value:"reading"}, {text:"Playing sports ⚽", value:"sports"}, {text:"Experimenting 🧪", value:"experimenting"}, {text:"Talking with friends 💬", value:"socializing"}] },
+            { id: 'q3', text: "Which superpower would you choose?", category: 'activity', options: [{text:"Super Strength 💪", value:"strength"}, {text:"Invisibility 👻", value:"stealth"}, {text:"Flying 🕊️", value:"flying"}, {text:"Mind Reading 🧠", value:"mind_reading"}] },
+            { id: 'q4', text: "Your favorite type of game involves...", category: 'activity', options: [{text:"Strategy & Planning ♟️", value:"strategy"}, {text:"Quick Reflexes ⚡", value:"reflexes"}, {text:"Building & Crafting 🛠️", value:"crafting"}, {text:"Storytelling 📖", value:"storytelling"}] },
+            { id: 'q5', text: "If you found a mysterious box, you would...", category: 'activity', options: [{text:"Open it immediately! 🤔", value:"curious"}, {text:"Analyze it first 🔬", value:"analytical"}, {text:"Ask for help 🙋", value:"collaborative"}, {text:"Leave it alone 🚶", value:"cautious"}] },
+            { id: 'q6', text: "You feel most energized when...", category: 'activity', options: [{text:"Learning something new 💡", value:"learning"}, {text:"Completing a task ✅", value:"completing"}, {text:"Making someone laugh 😂", value:"entertaining"}, {text:"Being in nature 🌲", value:"nature_energy"}] },
+            { id: 'q7', text: "Which school project sounds best?", category: 'activity', options: [{text:"Building a model volcano 🌋", value:"building_project"}, {text:"Writing a short story ✍️", value:"writing_project"}, {text:"Conducting a science fair experiment 🔬", value:"science_project"}, {text:"Organizing a class event 🎉", value:"organizing_project"}] },
+
+            // Work Style Preferences
+            { id: 'q8', text: "Do you prefer tasks with clear rules or open-ended ones?", category: 'workStyle', options: [{text:"Clear Rules 👍", value:"rules"}, {text:"Open-Ended 🤔", value:"open_ended"}] },
+            { id: 'q9', text: "When working on a project, you like to...", category: 'workStyle', options: [{text:"Focus on one part deeply 🎯", value:"focus_deep"}, {text:"Understand the whole system 🌐", value:"focus_broad"}, {text:"Jump between different tasks 🤸", value:"multitasking"}] },
+            { id: 'q10', text: "You prefer to work...", category: 'workStyle', options: [{text:"Mostly Alone 👤", value:"alone"}, {text:"With a Small Team 🧑‍🤝‍🧑", value:"team_small"}, {text:"With a Large Group 👨‍👩‍👧‍👦", value:"team_large"}, {text:"Leading Others 👑", value:"leading"}] },
+            { id: 'q11', text: "How do you feel about presenting your work?", category: 'workStyle', options: [{text:"Love it! 🎤", value:"presenting_love"}, {text:"Okay with it 🙂", value:"presenting_ok"}, {text:"Prefer not to 😅", value:"presenting_avoid"}] },
+            { id: 'q12', text: "When faced with a problem, you first...", category: 'workStyle', options: [{text:"Research solutions 🧐", value:"research"}, {text:"Try things out immediately 🧪", value:"trial_error"}, {text:"Ask someone experienced 🙏", value:"ask_help"}, {text:"Brainstorm ideas 💡", value:"brainstorm"}] },
+            { id: 'q13', text: "Do you like routines or variety?", category: 'workStyle', options: [{text:"Routines are comforting 😌", value:"routine"}, {text:"Variety is exciting! ✨", value:"variety"}] },
+
+            // Environment Preferences
+            { id: 'q14', text: "Your ideal workplace is...", category: 'environment', options: [{text:"Quiet Indoors 🤫", value:"indoors_quiet"}, {text:"Busy Indoors 🏢", value:"indoors_busy"}, {text:"Outdoors 🌲", value:"outdoors"}, {text:"Changing/Traveling ✈️", value:"variable"}, {text:"From Home 🏠", value:"home"}] },
+            { id: 'q15', text: "Would you prefer working with computers, people, or things?", category: 'environment', options: [{text:"Computers 💻", value:"computers"}, {text:"People 😄", value:"people"}, {text:"Things (Hands-on) 🖐️", value:"things"}] },
+            { id: 'q16', text: "How important is it for your work to be visually appealing?", category: 'environment', options: [{text:"Very Important! ✨", value:"visual_high"}, {text:"Somewhat Important 🙂", value:"visual_medium"}, {text:"Not really important 👍", value:"visual_low"}] },
+            { id: 'q17', text: "Do you like working under pressure?", category: 'environment', options: [{text:"Yes, it's exciting! 🔥", value:"pressure_yes"}, {text:"Sometimes 🙂", value:"pressure_sometimes"}, {text:"No, it's stressful 😰", value:"pressure_no"}] },
+            { id: 'q18', text: "Would you rather work in a lab, an office, or a workshop?", category: 'environment', options: [{text:"Lab 🔬", value:"lab"}, {text:"Office 💼", value:"office"}, {text:"Workshop 🛠️", value:"workshop"}, {text:"Out in the field 🌳", value:"field"}] },
+
+            // Focus/Thinking Style
+            { id: 'q19', text: "You like focusing on...", category: 'focus', options: [{text:"Details & Accuracy 🔬", value:"details"}, {text:"The Big Picture 🗺️", value:"big_picture"}, {text:"Hands-on Tasks 🖐️", value:"hands_on"}, {text:"Ideas & Strategy 💡", value:"ideas"}, {text:"Feelings & Emotions ❤️", value:"emotions"}] },
+            { id: 'q20', text: "Are you better at remembering faces or names?", category: 'focus', options: [{text:"Faces 😊", value:"memory_faces"}, {text:"Names 📛", value:"memory_names"}, {text:"Both/Neither 🤔", value:"memory_mixed"}] },
+            { id: 'q21', text: "Do you prefer logic or intuition?", category: 'focus', options: [{text:"Logic Always! 🧠", value:"logic"}, {text:"Trust my Gut! ✨", value:"intuition"}, {text:"A Mix of Both 👍", value:"logic_intuition_mix"}] },
+            { id: 'q22', text: "When learning, you prefer...", category: 'focus', options: [{text:"Reading & Writing 📖", value:"learn_read_write"}, {text:"Watching & Listening 🎧", value:"learn_watch_listen"}, {text:"Doing & Experiencing 🤸", value:"learn_do"}] },
+            { id: 'q23', text: "How patient are you with complex tasks?", category: 'focus', options: [{text:"Very Patient 🙂", value:"patience_high"}, {text:"Moderately Patient 🤔", value:"patience_medium"}, {text:"Easily Frustrated 😬", value:"patience_low"}] },
+
+            // Subject Interests
+            { id: 'q24', text: "You're most interested in...", category: 'subject', options: [{text:"Science/Math 🧪", value:"science_math"}, {text:"Arts/Humanities 🎭", value:"arts_humanities"}, {text:"Technology 💻", value:"technology"}, {text:"Nature/Animals 🐾", value:"nature_animals"}, {text:"People/Health 🩺", value:"people_health"}, {text:"Business/Money 💰", value:"business"}] },
+            { id: 'q25', text: "Which topic fascinates you more?", category: 'subject', options: [{text:"How things work ⚙️", value:"how_things_work"}, {text:"Why people do things 🤔", value:"why_people"}, {text:"The beauty of nature 🦋", value:"nature_beauty"}] },
+            { id: 'q26', text: "Would you rather explore space or the deep ocean?", category: 'subject', options: [{text:"Space! 🚀", value:"explore_space"}, {text:"Deep Ocean! 🐙", value:"explore_ocean"}] },
+            { id: 'q27', text: "Which historical period interests you most?", category: 'subject', options: [{text:"Ancient Times 🏛️", value:"history_ancient"}, {text:"Medieval Times 🏰", value:"history_medieval"}, {text:"The Future 🤖", value:"history_future"}, {text:"Recent History 📰", value:"history_recent"}] },
+            { id: 'q28', text: "What kind of stories do you prefer?", category: 'subject', options: [{text:"Adventure & Action ⚔️", value:"story_adventure"}, {text:"Mystery & Puzzles ❓", value:"story_mystery"}, {text:"Fantasy & Magic ✨", value:"story_fantasy"}, {text:"Real-life Stories 😊", value:"story_realistic"}] },
+            { id: 'q29', text: "You find learning about _______ more exciting.", category: 'subject', options: [{text:"Different Cultures 🌍", value:"culture"}, {text:"The Human Body ❤️", value:"body"}, {text:"Computer Code ⌨️", value:"code"}, {text:"Animal Behavior 🐒", value:"animal_behavior"}] },
+            { id: 'q30', text: "If you could invent anything, it would be...", category: 'subject', options: [{text:"A helpful robot 🤖", value:"invent_robot"}, {text:"A new form of art 🖼️", value:"invent_art"}, {text:"A cure for a disease 💊", value:"invent_cure"}, {text:"A time machine ⏳", value:"invent_time"}] },
+             // Add 20+ more questions following the pattern...
+            { id: 'q31', text: "Which environment makes you feel most creative?", category: 'environment', options: [{text:"A bustling city cafe ☕", value:"creative_cafe"}, {text:"A quiet library 📚", value:"creative_library"}, {text:"A messy art studio 🎨", value:"creative_studio"}, {text:"A walk in the park 🌳", value:"creative_park"}] },
+            { id: 'q32', text: "You are better at tasks requiring...", category: 'focus', options: [{text:"Physical coordination 🤸", value:"physical_coordination"}, {text:"Mental focus 🧘", value:"mental_focus"}, {text:"Emotional understanding ❤️", value:"emotional_understanding"}] },
+            { id: 'q33', text: "Would you rather design a game or play one?", category: 'activity', options: [{text:"Design it! 💡", value:"design_game"}, {text:"Play it! 🎮", value:"play_game"}] },
+            { id: 'q34', text: "How comfortable are you with public speaking?", category: 'workStyle', options: [{text:"Very Comfortable 📣", value:"public_speaking_high"}, {text:"A little nervous 😅", value:"public_speaking_medium"}, {text:"Prefer to avoid it 🙅", value:"public_speaking_low"}] },
+            { id: 'q35', text: "Which sense do you rely on most?", category: 'focus', options: [{text:"Sight 👀", value:"sense_sight"}, {text:"Hearing 👂", value:"sense_hearing"}, {text:"Touch 🖐️", value:"sense_touch"}, {text:"Smell/Taste 👃", value:"sense_smell_taste"}] },
+            { id: 'q36', text: "Do you enjoy following recipes or experimenting in the kitchen?", category: 'activity', options: [{text:"Follow the Recipe 📖", value:"follow_recipe"}, {text:"Experiment! 🧪", value:"experiment_cook"}] },
+            { id: 'q37', text: "You prefer activities that are...", category: 'workStyle', options: [{text:"Predictable & Stable 👍", value:"predictable"}, {text:"Challenging & Changing 🔥", value:"challenging"}] },
+            { id: 'q38', text: "Which type of movie do you prefer?", category: 'subject', options: [{text:"Documentaries 🌍", value:"movie_documentary"}, {text:"Comedies 😂", value:"movie_comedy"}, {text:"Action/Adventure 💥", value:"movie_action"}, {text:"Dramas 🎭", value:"movie_drama"}] },
+            { id: 'q39', text: "How important is helping the environment to you?", category: 'subject', options: [{text:"Very Important 🌱", value:"env_high"}, {text:"Somewhat Important 🙂", value:"env_medium"}, {text:"Less of a focus 🤔", value:"env_low"}] },
+            { id: 'q40', text: "Would you rather work with your hands or your mind?", category: 'focus', options: [{text:"Hands 🖐️", value:"work_hands"}, {text:"Mind 🧠", value:"work_mind"}, {text:"Both! 👍", value:"work_both"}] },
+            { id: 'q41', text: "What kind of problem solving do you enjoy?", category: 'activity', options: [{text:"Logical Deduction 🧐", value:"solve_logic"}, {text:"Creative Brainstorming ✨", value:"solve_creative"}, {text:"Practical Fixes 🔧", value:"solve_practical"}, {text:"Helping resolve conflicts 🤝", value:"solve_conflict"}] },
+            { id: 'q42', text: "How do you feel about deadlines?", category: 'workStyle', options: [{text:"Motivating! 🔥", value:"deadline_motivated"}, {text:"A bit stressful 😬", value:"deadline_stress"}, {text:"I ignore them! 😎", value:"deadline_ignore"}] },
+            { id: 'q43', text: "Your ideal tool is a...", category: 'subject', options: [{text:"Microscope 🔬", value:"tool_microscope"}, {text:"Paintbrush 🖌️", value:"tool_paintbrush"}, {text:"Computer 💻", value:"tool_computer"}, {text:"Hammer 🔨", value:"tool_hammer"}] },
+            { id: 'q44', text: "Do you prefer indoor plants or outdoor gardens?", category: 'environment', options: [{text:"Indoor Plants🪴", value:"plants_indoor"}, {text:"Outdoor Gardens 🌷", value:"plants_outdoor"}, {text:"Both are great! 👍", value:"plants_both"}] },
+            { id: 'q45', text: "How important is precision in your work?", category: 'focus', options: [{text:"Essential! ✅", value:"precision_high"}, {text:"Good enough is okay 🙂", value:"precision_medium"}, {text:"Not very important 🤔", value:"precision_low"}] },
+            { id: 'q46', text: "Which activity relaxes you most?", category: 'activity', options: [{text:"Listening to music 🎧", value:"relax_music"}, {text:"Exercising 🏃", value:"relax_exercise"}, {text:"Reading a book 📖", value:"relax_reading"}, {text:"Spending time with pets 🐾", value:"relax_pets"}] },
+            { id: 'q47', text: "Would you rather manage a project or execute tasks?", category: 'workStyle', options: [{text:"Manage the Project 📋", value:"manage"}, {text:"Execute the Tasks ✅", value:"execute"}] },
+            { id: 'q48', text: "Which natural phenomenon is most awe-inspiring?", category: 'subject', options: [{text:"Thunderstorms ⛈️", value:"nature_storm"}, {text:"Northern Lights ✨", value:"nature_aurora"}, {text:"Volcanoes 🌋", value:"nature_volcano"}, {text:"Coral Reefs 🐠", value:"nature_reef"}] },
+            { id: 'q49', text: "How do you prefer to communicate ideas?", category: 'focus', options: [{text:"Writing it down ✍️", value:"comm_writing"}, {text:"Talking it through 🗣️", value:"comm_talking"}, {text:"Drawing or visualizing 🖼️", value:"comm_visual"}, {text:"Building a prototype 🧱", value:"comm_prototype"}] },
+            { id: 'q50', text: "What's more important: creativity or efficiency?", category: 'workStyle', options: [{text:"Creativity ✨", value:"value_creativity"}, {text:"Efficiency ⏱️", value:"value_efficiency"}, {text:"Both are key! 👍", value:"value_both"}] },
+            { id: 'q51', text: "You enjoy activities that require...", category: 'activity', options: [{text:"Deep concentration 🧘", value:"activity_concentration"}, {text:"Physical movement 🤸", value:"activity_movement"}, {text:"Social interaction 💬", value:"activity_social"}, {text:"Artistic expression 🎭", value:"activity_artistic"}] },
+        ];
+
+        // --- Functions ---
+
+        /** Shuffles array in place. Fisher-Yates algorithm. */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /** Selects unique random questions for the round. */
+        function selectRandomQuestions() {
+            const shuffledPool = [...questionPool];
+            shuffleArray(shuffledPool);
+            return shuffledPool.slice(0, NUM_QUESTIONS);
+        }
+
+        /** Creates and displays the question cards dynamically. */
+        function displayQuestions() {
+            questionsContainer.innerHTML = ''; // Clear previous questions
+            predictButtonContainer.classList.add('hidden'); // Hide predict button initially
+
+            currentRoundQuestions.forEach((qInfo, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card'; // Changed class name
+                card.dataset.questionId = qInfo.id; // Store question ID
+
+                const heading = document.createElement('h2');
+                heading.className = 'question-heading'; // Use new class for question text
+                heading.textContent = `Question ${index + 1}: ${qInfo.text}`;
+
+                const choicesGrid = document.createElement('div');
+                choicesGrid.className = 'choices-grid';
+                choicesGrid.id = `${qInfo.id}Choices`; // Unique ID for choices
+
+                qInfo.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-button';
+                    button.dataset.value = option.value;
+
+                    const emojiSpan = document.createElement('span');
+                    emojiSpan.textContent = option.text.match(/[\p{Emoji}\u200d]+/u)?.[0] || '❔'; // Extract emoji
+
+                    const textSpan = document.createElement('span'); // Wrap text
+                    textSpan.className = 'text-content';
+                    textSpan.textContent = option.text.replace(/[\p{Emoji}\u200d]+/u, '').trim(); // Text only
+
+                    button.appendChild(emojiSpan);
+                    button.appendChild(textSpan);
+                    choicesGrid.appendChild(button);
+                });
+
+                card.appendChild(heading);
+                card.appendChild(choicesGrid);
+                questionsContainer.appendChild(card);
+
+                // Add event listener to the newly created grid
+                choicesGrid.addEventListener('click', handleChoiceClick);
+            });
+             predictButtonContainer.classList.remove('hidden'); // Show predict button after questions are displayed
+             checkIfReadyToPredict(); // Check if button should be enabled
+        }
+
+
+        /** Checks if all choices have been made and enables/disables the predict button. */
+        function checkIfReadyToPredict() {
+            // Check if an answer exists for every question currently displayed
+            const allAnswered = currentRoundQuestions.every(qInfo => userChoices[qInfo.id] !== undefined && userChoices[qInfo.id] !== null);
+            predictBtn.disabled = !allAnswered; // Enable only if all questions have an answer
+        }
+
+        /** Handles clicks on choice buttons, updates state, and styles. */
+        function handleChoiceClick(event) {
+            const button = event.target.closest('.choice-button');
+            if (!button) return;
+
+            const choicesGrid = button.parentElement;
+            const questionId = choicesGrid.id.replace('Choices', '');
+            const value = button.dataset.value;
+
+            // Update state
+            userChoices[questionId] = value;
+
+            // Update styling within the specific question's choices
+            const buttonsInCategory = choicesGrid.querySelectorAll('.choice-button');
+            buttonsInCategory.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.value === value) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            checkIfReadyToPredict(); // Check if predict button should be enabled
+        }
+
+        /** Heuristic prediction based on answer values. */
+        function predictJobCategory() {
+             let scores = {
+                creative: 0, logical: 0, technical: 0, helping: 0, nature: 0,
+                outdoors: 0, indoors: 0, hands_on: 0, leadership: 0, detail: 0,
+                strategy: 0, artistic: 0, science: 0, people: 0, building: 0
+            };
+
+            // Tally scores based on the *values* of the chosen answers
+            currentRoundQuestions.forEach(qInfo => {
+                const choiceValue = userChoices[qInfo.id];
+                if (!choiceValue) return;
+
+                // Simplified scoring based on choice values (expandable)
+                if (['creating', 'writing_project', 'design_game', 'creative_studio', 'creative_park', 'invent_art', 'tool_paintbrush', 'comm_visual', 'value_creativity', 'activity_artistic'].includes(choiceValue)) scores.creative++;
+                if (['solving', 'analytical', 'learning', 'science_project', 'rules', 'focus_deep', 'research', 'logic', 'patience_high', 'science_math', 'how_things_work', 'solve_logic', 'precision_high', 'work_mind', 'activity_concentration'].includes(choiceValue)) scores.logical++;
+                if (['building', 'building_project', 'computers', 'technology', 'code', 'invent_robot', 'tool_computer', 'comm_prototype', 'solve_practical', 'work_hands', 'tool_hammer'].includes(choiceValue)) scores.technical++;
+                if (['helping', 'socializing', 'collaborative', 'people', 'people_health', 'body', 'solve_conflict', 'comm_talking', 'emotional_understanding'].includes(choiceValue)) scores.helping++;
+                if (['nature_energy', 'outdoors', 'field', 'nature_animals', 'nature_beauty', 'explore_ocean', 'env_high', 'plants_outdoor', 'nature_storm', 'nature_aurora', 'nature_volcano', 'nature_reef', 'relax_pets', 'animal_behavior'].includes(choiceValue)) scores.nature++;
+                if (['sports', 'crafting', 'strength', 'building_project', 'things', 'workshop', 'hands_on', 'physical_coordination', 'work_hands', 'tool_hammer', 'comm_prototype', 'solve_practical'].includes(choiceValue)) scores.hands_on++;
+                if (['leading', 'presenting_love', 'manage', 'leadership'].includes(choiceValue)) scores.leadership++;
+                if (['organizing', 'analytical', 'rules', 'focus_deep', 'details', 'precision_high', 'activity_concentration'].includes(choiceValue)) scores.detail++;
+                if (['strategy', 'focus_broad', 'brainstorm', 'ideas', 'big_picture', 'manage', 'value_efficiency'].includes(choiceValue)) scores.strategy++;
+                if (['creating', 'writing_project', 'design_game', 'creative_studio', 'creative_park', 'invent_art', 'tool_paintbrush', 'comm_visual', 'arts_humanities', 'story_fantasy', 'movie_drama', 'activity_artistic'].includes(choiceValue)) scores.artistic++;
+                 if (['experimenting', 'science_project', 'analytical', 'research', 'lab', 'science_math', 'body', 'invent_cure', 'tool_microscope'].includes(choiceValue)) scores.science++;
+                 if (['socializing', 'collaborative', 'team_small', 'team_large', 'presenting_love', 'ask_help', 'people', 'people_health', 'why_people', 'body', 'solve_conflict', 'comm_talking', 'activity_social', 'emotional_understanding'].includes(choiceValue)) scores.people++;
+                 if (['building', 'building_project', 'crafting', 'workshop', 'hands_on', 'tool_hammer', 'comm_prototype', 'solve_practical'].includes(choiceValue)) scores.building++;
+
+
+            });
+
+
+            // Determine highest scoring categories
+            let maxScore = -1;
+            let predictedCategories = [];
+            for (const category in scores) {
+                if (scores[category] > maxScore) {
+                    maxScore = scores[category];
+                    predictedCategories = [category];
+                } else if (scores[category] === maxScore && maxScore > 0) {
+                    predictedCategories.push(category);
+                }
+            }
+
+             // Map categories to job suggestions (Refined based on combined scores)
+            if (scores.technical >= 2 && scores.logical >=1) return "Programmer 💻 or Engineer ⚙️?";
+            if (scores.artistic >= 2 || scores.creative >= 2) {
+                 if (scores.hands_on >= 1) return "Artist 🎨 or Designer 💡?";
+                 return "Musician 🎵 or Writer ✍️?";
+            }
+            if (scores.helping >= 2 && scores.people >= 1) {
+                 if (scores.science >= 1) return "Doctor/Nurse 🩺?";
+                 return "Teacher 🧑‍🏫 or Caregiver 🤗?";
+            }
+            if (scores.science >= 2 && scores.logical >=1) return "Scientist 🔬?";
+            if (scores.nature >= 2) {
+                 if (scores.helping >= 1) return "Vet 🐾 or Conservationist 🌱?";
+                 return "Explorer 🧭 or Park Ranger 🌲?";
+            }
+            if (scores.building >= 1 && scores.hands_on >= 1) return "Builder 🏗️ or Architect 🏛️?";
+            if (scores.leadership >= 1 && scores.strategy >= 1) return "Manager or Entrepreneur 💼?";
+            if (scores.hands_on >= 2 && scores.detail >= 1) return "Chef 🧑‍🍳 or Craftsperson 🛠️?";
+
+            // Fallback based on single high score if combinations don't match strongly
+            if (predictedCategories.includes('technical')) return "Tech Innovator 💻?";
+            if (predictedCategories.includes('artistic')) return "Creative Artist 🎨?";
+            if (predictedCategories.includes('helping')) return "Community Helper 🤗?";
+            if (predictedCategories.includes('science')) return "Researcher 🔬?";
+            if (predictedCategories.includes('nature')) return "Nature Expert 🐾?";
+            if (predictedCategories.includes('building')) return "Maker/Builder 🏗️?";
+            if (predictedCategories.includes('logical')) return "Analyst/Problem Solver 🧐?";
+             if (predictedCategories.includes('people')) return "Social Connector 💬?";
+
+
+            return "a unique and exciting path ✨?"; // Default fallback
+        }
+
+
+        /** Runs the prediction process. */
+        function runPrediction() {
+            if (predictBtn.disabled) return;
+
+            questionsContainer.classList.add('hidden'); // Hide questions
+            predictButtonContainer.classList.add('hidden'); // Hide button container
+            resultArea.classList.remove('hidden');
+            resultText.textContent = '';
+            predictedJobDiv.classList.add('hidden');
+            thinkingText.textContent = '🧠 Analyzing personality matrix...';
+            thinkingText.style.display = 'block';
+            resultArea.classList.remove('visible');
+
+            setTimeout(() => thinkingText.textContent = '✨ Aligning skills and passions...', 1000);
+
+            setTimeout(() => {
+                const prediction = predictJobCategory(); // Use heuristic prediction
+                thinkingText.style.display = 'none';
+                resultText.textContent = "Based on your choices, your ideal path might involve being a...";
+                predictedJobDiv.textContent = prediction;
+                predictedJobDiv.classList.remove('hidden');
+                resultArea.classList.add('visible');
+            }, 2500);
+        }
+
+        /** Resets the game to its initial state. */
+        function resetGame() {
+            userChoices = {}; // Clear previous answers
+            currentRoundQuestions = selectRandomQuestions(); // Select new random questions
+
+            predictBtn.disabled = true; // Disable predict button
+            resultArea.classList.add('hidden');
+            resultArea.classList.remove('visible');
+            predictedJobDiv.classList.add('hidden');
+            questionsContainer.classList.remove('hidden'); // Show questions container
+            predictButtonContainer.classList.remove('hidden'); // Show predict button container
+
+            displayQuestions(); // Display the new set of questions
+        }
+
+        // --- Theme Switching Logic (With localStorage) ---
+        function applyTheme(themeName) {
+            document.body.dataset.theme = themeName;
+            try { localStorage.setItem('dreamJobPredictorTheme', themeName); }
+            catch (e) { console.warn("Could not save theme preference:", e); }
+        }
+
+        function loadSavedTheme() {
+            let savedTheme = 'default';
+            try { savedTheme = localStorage.getItem('dreamJobPredictorTheme') || 'default'; }
+            catch (e) { console.warn("Could not load theme preference:", e); }
+            themeSelector.value = savedTheme;
+            applyTheme(savedTheme);
+        }
+
+        themeSelector.addEventListener('change', (event) => applyTheme(event.target.value));
+
+        // --- Event Listeners ---
+        // Event listener added dynamically in displayQuestions
+        predictBtn.addEventListener('click', runPrediction);
+        resetBtn.addEventListener('click', resetGame);
+
+        // --- Initial Load ---
+        loadSavedTheme();
+        resetGame(); // Initialize game state and display first set of questions
+
+    </script>
+
+</body>
+</html>
